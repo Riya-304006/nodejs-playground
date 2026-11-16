@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-playground",
+  "version": "1.0.0",
+  "description": "Node.js API server with HTTP header validation and request monitoring",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "api-monitoring",
+    "http-headers"
+  ],
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "headergauge": "^1.0.0"
+  }
+}
