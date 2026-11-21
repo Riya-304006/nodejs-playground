@@ -10,6 +10,9 @@ const stats = {
 };
 
 const server = http.createServer((req, res) => {
+  // Remove query parameters from the URL before checking routes
+  const pathname = req.url.split('?')[0];
+
   const analysis = analyzeHeaders(req.headers, {
     maxTotalBytes: 16384,
     maxHeaderBytes: 8192
@@ -21,6 +24,7 @@ const server = http.createServer((req, res) => {
   console.log(`\n${req.method} ${req.url}`);
   console.log('Header size:', analysis.totalBytes, 'bytes');
 
+  // Reject requests with oversized headers
   if (!analysis.withinBudget || analysis.oversizedHeaders.length > 0) {
     stats.rejectedRequests++;
 
@@ -34,7 +38,8 @@ const server = http.createServer((req, res) => {
 
   stats.acceptedRequests++;
 
-  if (req.url === '/' && req.method === 'GET') {
+  // Root endpoint
+  if (pathname === '/' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       application: 'Node.js API Monitoring Server',
@@ -49,13 +54,17 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.url === '/health' && req.method === 'GET') {
+  // Health check endpoint
+  if (pathname === '/health' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'Server is healthy' }));
+    res.end(JSON.stringify({
+      status: 'Server is healthy'
+    }));
     return;
   }
 
-  if (req.url === '/api/data' && req.method === 'GET') {
+  // Data endpoint
+  if (pathname === '/api/data' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       message: 'Data retrieved successfully',
@@ -64,14 +73,18 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.url === '/api/stats' && req.method === 'GET') {
+  // Statistics endpoint
+  if (pathname === '/api/stats' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(stats, null, 2));
     return;
   }
 
+  // Handle unknown routes
   res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Route not found' }));
+  res.end(JSON.stringify({
+    error: 'Route not found'
+  }));
 });
 
 const PORT = process.env.PORT || 3000;
