@@ -1,3 +1,4 @@
+
 const http = require('http');
 const { analyzeHeaders } = require('headergauge');
 
@@ -33,6 +34,21 @@ const server = http.createServer((req, res) => {
 
   stats.acceptedRequests++;
 
+  if (req.url === '/' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      application: 'Node.js API Monitoring Server',
+      status: 'running',
+      poweredBy: 'HeaderGauge',
+      endpoints: {
+        health: '/health',
+        data: '/api/data',
+        statistics: '/api/stats'
+      }
+    }, null, 2));
+    return;
+  }
+
   if (req.url === '/health' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'Server is healthy' }));
@@ -58,6 +74,8 @@ const server = http.createServer((req, res) => {
   res.end(JSON.stringify({ error: 'Route not found' }));
 });
 
-server.listen(3000, () => {
-  console.log('API Monitoring Server running at http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`API Monitoring Server running on port ${PORT}`);
 });
