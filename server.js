@@ -11,8 +11,8 @@ const stats = {
 
 const server = http.createServer((req, res) => {
   const analysis = analyzeHeaders(req.headers, {
-    maxTotalBytes: 512,
-    maxHeaderBytes: 256
+    maxTotalBytes: 16384,
+    maxHeaderBytes: 8192
   });
 
   stats.totalRequests++;
